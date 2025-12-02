@@ -42,7 +42,6 @@ require_once("$CFG->libdir/externallib.php");
  * Web service endpoints for managing webhooks.
  */
 class webhook_service extends external_api {
-
     /** @var array Allowed event types for webhooks */
     const EVENTTYPES = [
         'user_created',
@@ -76,6 +75,13 @@ class webhook_service extends external_api {
 
     /**
      * Add a new webhook.
+     *
+     * @param string $name Webhook name
+     * @param string $url Webhook URL
+     * @param string $eventtype Event type for the webhook
+     * @param array $meta Additional metadata such as course ID (optional)
+     * @return array Contains inserted webhook ID and operation status
+     * @throws \invalid_parameter_exception If event type is invalid
      */
     public static function add_webhook($name, $url, $eventtype, $meta = []) {
         global $DB;
@@ -179,5 +185,4 @@ class webhook_service extends external_api {
             'deletedid' => new external_value(PARAM_INT, 'Deleted webhook ID'),
         ]);
     }
-
 }

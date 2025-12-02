@@ -29,7 +29,6 @@ namespace local_zohoflow\profilefield;
  * Handles profile field data retrieval for users.
  */
 class profilefield_manager {
-
     /**
      * Get all user profile fields with category names, sorted by category and sortorder.
      *

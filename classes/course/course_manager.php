@@ -26,12 +26,10 @@
 namespace local_zohoflow\course;
 
 use local_zohoflow\webhook\webhook_manager;
-
 /**
  * Handles profile field data retrieval for users.
  */
 class course_manager {
-
     /**
      * Get detailed information about a course.
      *
@@ -104,9 +102,9 @@ class course_manager {
      */
     public static function payload_user_course_updated(\core\event\base $event) {
         global $DB;
-        if ($event->eventname === '\core\event\course_updated' ) {
+        if ($event->eventname === '\core\event\course_updated') {
             $webhooks = webhook_manager::get_all_event_webhooks('course_updated');
-            if (!empty($webhooks) ) {
+            if (!empty($webhooks)) {
                 $returndata = [
                     "event" => "course_updated",
                     "eventname" => $event->eventname,

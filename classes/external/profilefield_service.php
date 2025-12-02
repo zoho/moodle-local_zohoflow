@@ -45,7 +45,6 @@ require_once("$CFG->libdir/externallib.php");
  * @category  external
  */
 class profilefield_service extends external_api {
-
     /**
      * Describe parameters for get_profile_fields.
      *
@@ -94,4 +93,3 @@ class profilefield_service extends external_api {
         );
     }
 }
-

@@ -35,7 +35,6 @@ use core_privacy\local\metadata\null_provider;
  * @category  privacy
  */
 class provider implements null_provider {
-
     /**
      * Get the language string identifier for the privacy statement.
      *

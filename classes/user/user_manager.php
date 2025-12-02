@@ -42,7 +42,6 @@ use local_zohoflow\webhook\webhook_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_manager {
-
     /**
      * Retrieves all roles available in Moodle.
      *
@@ -118,7 +117,24 @@ class user_manager {
     }
 
     /**
-     * Get enrolment info using Moodle native APIs.
+     * Retrieves enrolment details for a specific user enrolment record.
+     *
+     * Uses Moodle's native APIs to fetch user role assignments, course groups,
+     * enrolment method details, and enrolment status within the course context.
+     *
+     * @param int $userenrolid The ID from the user_enrolments table.
+     * @return array Returns an associative array including:
+     *               - userenrolid (int)
+     *               - userid (int)
+     *               - courseid (int)
+     *               - coursename (string)
+     *               - enrolmethod (string)
+     *               - status (string) Active or suspended
+     *               - timestart (int)
+     *               - timeend (int)
+     *               - roles (array)
+     *               - groups (array)
+     * @throws \dml_missing_record_exception If the record does not exist.
      */
     private static function get_enrolment_details_native($userenrolid) {
         global $DB;
@@ -140,7 +156,7 @@ class user_manager {
         $groupids = groups_get_user_groups($course->id, $ue->userid);
         $groupdetails = [];
         if (!empty($groupids[0])) {
-            list($insql, $params) = $DB->get_in_or_equal($groupids[0]);
+            [$insql, $params] = $DB->get_in_or_equal($groupids[0]);
             $groupdetails = $DB->get_records_select('groups', "id $insql", $params, '', 'id,name');
         }
 
@@ -189,7 +205,7 @@ class user_manager {
                     "anonymous" => $event->anonymous,
                     "other" => $event->other,
                     "timecreated" => $event->timecreated,
-                    "data" => self::get_user_with_profile_fields( $userid),
+                    "data" => self::get_user_with_profile_fields($userid),
                 ];
                 foreach ($webhooks as $webhook) {
                     webhook_manager::send($webhook->url, $returndata);
@@ -228,7 +244,7 @@ class user_manager {
                     "anonymous" => $event->anonymous,
                     "other" => $event->other,
                     "timecreated" => $event->timecreated,
-                    "data" => self::get_user_with_profile_fields( $userid),
+                    "data" => self::get_user_with_profile_fields($userid),
                 ];
                 foreach ($webhooks as $webhook) {
                     webhook_manager::send($webhook->url, $returndata);
@@ -267,7 +283,7 @@ class user_manager {
                     "anonymous" => $event->anonymous,
                     "other" => $event->other,
                     "timecreated" => $event->timecreated,
-                    "data" => self::get_user_with_profile_fields( $userid),
+                    "data" => self::get_user_with_profile_fields($userid),
                 ];
                 foreach ($webhooks as $webhook) {
                     webhook_manager::send($webhook->url, $returndata);
@@ -306,7 +322,7 @@ class user_manager {
                     "anonymous" => $event->anonymous,
                     "other" => $event->other,
                     "timecreated" => $event->timecreated,
-                    "data" => self::get_user_with_profile_fields( $userid),
+                    "data" => self::get_user_with_profile_fields($userid),
                 ];
                 foreach ($webhooks as $webhook) {
                     webhook_manager::send($webhook->url, $returndata);
@@ -364,7 +380,7 @@ class user_manager {
             $userid = $event->relateduserid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_graded');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
                 $user['grade'] = $event->get_grade();
                 $returndata = [
                     "event" => "user_graded",
@@ -408,7 +424,7 @@ class user_manager {
             $userid = $event->relateduserid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_enrolment_created');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
                 $user['enrolment'] = self::get_enrolment_details_native($event->objectid);
                 $returndata = [
                     "event" => "user_enrolment_created",
@@ -452,7 +468,7 @@ class user_manager {
             $userid = $event->relateduserid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_enrolment_updated');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
                 $user['enrolment'] = self::get_enrolment_details_native($event->objectid);
                 $returndata = [
                     "event" => "user_enrolment_updated",
@@ -496,7 +512,7 @@ class user_manager {
             $userid = $event->relateduserid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_enrolment_deleted');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
                 $returndata = [
                     "event" => "user_enrolment_deleted",
                     "eventname" => $event->eventname,
@@ -539,7 +555,7 @@ class user_manager {
             $userid = $event->relateduserid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_course_completed');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
                 $returndata = [
                     "event" => "user_course_completed",
                     "eventname" => $event->eventname,
@@ -585,7 +601,7 @@ class user_manager {
             $courseid = $event->courseid;
             $webhooks = webhook_manager::get_all_event_webhooks('user_course_module_completed');
             if (!empty($webhooks) && self::is_valid_user($userid)) {
-                $user = self::get_user_with_profile_fields( $userid);
+                $user = self::get_user_with_profile_fields($userid);
 
                 $cm = get_coursemodule_from_id(null, $cmid, 0, false, MUST_EXIST);
                 $user['moduleinstance'] = $DB->get_record($cm->modname, ['id' => $cm->instance]);

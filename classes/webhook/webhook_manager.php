@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @package    local_zohoflow
  */
 class webhook_manager {
-
     /**
      * Add a webhook.
      *
@@ -115,7 +114,7 @@ class webhook_manager {
         global $DB;
 
         $sql = "SELECT *
-                FROM {". LOCAL_ZOHOFLOW_TABLE_WEBHOOKS. "}
+                FROM {" . LOCAL_ZOHOFLOW_TABLE_WEBHOOKS . "}
                 WHERE enabled = 1
                 AND " . $DB->sql_compare_text('eventtype') . " = :eventtype";
 

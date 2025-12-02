@@ -44,7 +44,6 @@ require_once("$CFG->libdir/externallib.php");
  * Provides external functions for user-related operations in local_zohoflow.
  */
 class user_service extends \external_api {
-
     /**
      * Describe parameters for get_roles.
      *
