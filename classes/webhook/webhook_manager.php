@@ -96,6 +96,9 @@ class webhook_manager {
 
     /**
      * Delete webhook by ID.
+     *
+     * @param int $id The ID of the webhook to delete.
+     * @return bool True if deletion was successful, false otherwise.
      */
     public static function delete_webhook($id) {
         global $DB;
@@ -122,7 +125,15 @@ class webhook_manager {
     }
 
     /**
-     * Send HTTP POST to webhook URL.
+     * Send HTTP POST request to a webhook URL with JSON payload.
+     *
+     * Automatically disables the webhook if HTTP status 410 is returned.
+     *
+     * @param string $url The webhook endpoint URL.
+     * @param array|object $data Payload to send (will be JSON encoded).
+     * @return array Returns an associative array containing:
+     *               - status (int) HTTP response status code
+     *               - response (string) Raw response body
      */
     public static function send($url, $data) {
         $curl = new \curl();
