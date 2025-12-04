@@ -34,7 +34,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_api;
 use context_system;
-use local_zohoflow\webhook\webhook_manager;
+use local_zohoflow\local\webhook\webhook_manager;
 
 require_once("$CFG->libdir/externallib.php");
 
@@ -82,13 +82,23 @@ class webhook_service extends external_api {
      * @param array $meta Additional metadata such as course ID (optional)
      * @return array Contains inserted webhook ID and operation status
      * @throws \invalid_parameter_exception If event type is invalid
+     * @throws \required_capability_exception If user lacks capability
      */
     public static function add_webhook($name, $url, $eventtype, $meta = []) {
         global $DB;
 
-        self::validate_context(context_system::instance());
+        $params = self::validate_parameters(
+            self::add_webhook_parameters(),
+            ['name' => $name, 'url' => $url, 'eventtype' => $eventtype, 'meta' => $meta]
+        );
 
-        // Validate event type.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/site:config', $context)) {
+            throw new required_capability_exception($context, 'moodle/site:config', 'nopermissions', '');
+        }
+
         if (!in_array($eventtype, self::EVENTTYPES)) {
             throw new invalid_parameter_exception('Invalid event type: ' . $eventtype);
         }
@@ -119,9 +129,19 @@ class webhook_service extends external_api {
 
     /**
      * List all stored webhooks.
+     *
+     * @return array Webhook list
+     * @throws \required_capability_exception If user lacks capability
      */
     public static function list_webhooks() {
-        self::validate_context(context_system::instance());
+        $params = self::validate_parameters(self::list_webhooks_parameters(), []);
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/site:config', $context)) {
+            throw new required_capability_exception($context, 'moodle/site:config', 'nopermissions', '');
+        }
+
         $records = webhook_manager::get_all_webhooks();
         return array_values($records);
     }
@@ -158,11 +178,19 @@ class webhook_service extends external_api {
      *
      * @param int $id Webhook ID
      * @return array Deletion result
+     * @throws \invalid_parameter_exception If webhook id is invalid
+     * @throws \required_capability_exception If user lacks capability
      */
     public static function delete_webhook($id) {
         global $DB;
 
-        self::validate_context(context_system::instance());
+        $params = self::validate_parameters(self::delete_webhook_parameters(), ['id' => $id]);
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/site:config', $context)) {
+            throw new required_capability_exception($context, 'moodle/site:config', 'nopermissions', '');
+        }
 
         // Check if record exists.
         $record = $DB->get_record('local_zohoflow_webhooks', ['id' => $id]);

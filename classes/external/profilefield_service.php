@@ -34,7 +34,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_api;
 use context_system;
-use local_zohoflow\profilefield\profilefield_manager;
+use local_zohoflow\local\profilefield\profilefield_manager;
 
 require_once("$CFG->libdir/externallib.php");
 
@@ -58,8 +58,20 @@ class profilefield_service extends external_api {
      * Get all user profile fields with category names, sorted by category and sortorder.
      *
      * @return array
+     * @throws \required_capability_exception If user lacks capability
      */
     public static function get_profile_fields() {
+        global $CFG;
+
+        self::validate_parameters(self::get_profile_fields_parameters(), []);
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/user:viewalldetails', $context)) {
+            throw new required_capability_exception($context, 'moodle/user:viewalldetails', 'nopermissions', '');
+        }
+
         return profilefield_manager::list_all_profile_fields();
     }
 

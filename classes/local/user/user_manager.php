@@ -23,10 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_zohoflow\user;
+namespace local_zohoflow\local\user;
 
 use core_user;
-use local_zohoflow\webhook\webhook_manager;
+use local_zohoflow\local\webhook\webhook_manager;
 
 /**
  * Manages user-related event payloads for the Zoho Flow integration.

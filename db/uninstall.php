@@ -26,19 +26,5 @@
  * Custom uninstall script for the local_zohoflow plugin.
  */
 function xmldb_local_zohoflow_uninstall() {
-    global $DB;
-
-    require_once(__DIR__ . '/../lib.php');
-
-    $dbman = $DB->get_manager();
-
-    // Define the table to drop.
-    $table = new xmldb_table(LOCAL_ZOHOFLOW_TABLE_WEBHOOKS);
-
-    // Drop table if it exists.
-    if ($dbman->table_exists($table)) {
-        $dbman->drop_table($table);
-    }
-
     return true;
 }

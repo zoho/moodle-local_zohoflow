@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_zohoflow\webhook;
+namespace local_zohoflow\local\webhook;
 
 defined('MOODLE_INTERNAL') || die();
 

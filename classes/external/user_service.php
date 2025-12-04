@@ -35,7 +35,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_api;
 use context_system;
-use local_zohoflow\user\user_manager;
+use local_zohoflow\local\user\user_manager;
 use core_user;
 
 require_once("$CFG->libdir/externallib.php");
@@ -57,8 +57,18 @@ class user_service extends \external_api {
      * Get all user roles.
      *
      * @return array
+     * @throws \required_capability_exception if user lacks capability
      */
     public static function get_roles() {
+        $params = self::validate_parameters(self::get_roles_parameters(), []);
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/user:viewalldetails', $context)) {
+            throw new required_capability_exception($context, 'moodle/user:viewalldetails', 'nopermissions', '');
+        }
+
         return user_manager::list_all_roles();
     }
 
@@ -95,8 +105,22 @@ class user_service extends \external_api {
      *
      * @param int $userid The user ID.
      * @return array User details with custom profile fields.
+     * @throws \invalid_parameter_exception If userid is invalid or user not found
+     * @throws \required_capability_exception If user lacks capability
      */
     public static function get_user_details_with_profile_fields($userid) {
+        $params = self::validate_parameters(
+            self::get_user_details_with_profile_fields_parameters(),
+            ['userid' => $userid]
+        );
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        if (!has_capability('moodle/user:viewalldetails', $context)) {
+            throw new required_capability_exception($context, 'moodle/user:viewalldetails', 'nopermissions', '');
+        }
+
         return user_manager::get_user_with_profile_fields($userid);
     }
 

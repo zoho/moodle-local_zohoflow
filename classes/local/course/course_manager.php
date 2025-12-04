@@ -23,9 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_zohoflow\course;
+namespace local_zohoflow\local\course;
 
-use local_zohoflow\webhook\webhook_manager;
+use local_zohoflow\local\webhook\webhook_manager;
 /**
  * Handles profile field data retrieval for users.
  */
