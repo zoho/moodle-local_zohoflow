@@ -604,7 +604,11 @@ class user_manager {
                 $user = self::get_user_with_profile_fields($userid);
 
                 $cm = get_coursemodule_from_id(null, $cmid, 0, false, MUST_EXIST);
-                $user['moduleinstance'] = $DB->get_record($cm->modname, ['id' => $cm->instance]);
+                $user['moduleinstance'] = $DB->get_record(
+                    $cm->modname,
+                    ['id' => $cm->instance],
+                    'id, name, course, intro, introformat'
+                );
 
                 $returndata = [
                     "event" => "user_course_module_completed",
